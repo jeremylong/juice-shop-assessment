@@ -1,0 +1,70 @@
+ext {
+    junitVersion = '5.5.1'
+}
+     
+apply plugin: 'java'
+apply plugin: 'idea'
+
+group = 'org.owasp'
+version = '1.0-SNAPSHOT'
+description = """Juice Shop Assessment"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'net.lightbody.bmp', name: 'browsermob-core', version:'2.1.5'
+    compile group: 'org.json', name: 'json', version:'20190722'
+    compile group: 'com.google.guava', name: 'guava', version:'28.0-jre'
+    compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.28'
+    compile group: 'org.slf4j', name:'slf4j-simple', version: '1.7.28'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version:'4.0.0'
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version:'3.141.59'
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
+}
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+    integrationTestImplementation.extendsFrom testImplementation
+}
+
+task integrationTest(type: Test, group: "verification") {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+integrationTest {
+    useJUnitPlatform {
+        includeTags 'integrationTest'
+    }
+}
+
+test {
+    useJUnitPlatform {
+        includeTags 'unitTest'
+    }
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
