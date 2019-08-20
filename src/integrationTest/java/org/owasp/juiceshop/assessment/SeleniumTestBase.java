@@ -44,6 +44,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class SeleniumTestBase {
 
+    private String baseUrl = "http://kubernetes.docker.internal:3000";
     private BrowserMobProxy proxy;
     private Proxy seleniumProxy;
     private WebDriver driver;
@@ -71,7 +72,7 @@ public class SeleniumTestBase {
     public void tearDown() {
         proxy.stop();
         try {
-        Alert alert = driver.switchTo().alert();
+            Alert alert = driver.switchTo().alert();
             alert.dismiss();
         } catch (NoAlertPresentException ex) {
             //ignore
@@ -79,7 +80,7 @@ public class SeleniumTestBase {
         driver.close();
         driver.quit();
     }
-    
+
     public BrowserMobProxy getProxy() {
         return proxy;
     }
@@ -88,35 +89,47 @@ public class SeleniumTestBase {
         return driver;
     }
 
-    private Proxy getSeleniumProxy(BrowserMobProxy proxyServer) {
+    public String getFullUrl(String url) {
+        if (url.length() == 1 && url.charAt(0) == '/' || url.length() > 1 && url.charAt(1) != '/') {
+            return baseUrl + url;
+        }
+        return url;
+    }
+
+    public WebDriver get(String url) {
+        driver.get(getFullUrl(url));
+        return driver;
+    }
+
+    protected Proxy getSeleniumProxy(BrowserMobProxy proxyServer) {
         Proxy selProxy = ClientUtil.createSeleniumProxy(proxyServer);
         try {
             String hostIp = Inet4Address.getLocalHost().getHostAddress();
             selProxy.setHttpProxy(hostIp + ":" + proxyServer.getPort());
             selProxy.setSslProxy(hostIp + ":" + proxyServer.getPort());
         } catch (UnknownHostException e) {
-            fail("invalid Host Address:" + e.getMessage()    );
+            fail("invalid Host Address:" + e.getMessage());
         }
         return selProxy;
     }
 
-    private BrowserMobProxy getProxyServer() {
+    protected BrowserMobProxy getProxyServer() {
         BrowserMobProxy mobProxy = new BrowserMobProxyServer();
         // trust applications with invalid certificates 
         mobProxy.setTrustAllServers(true);
         mobProxy.start();
         return mobProxy;
     }
-   
+
     protected void login(WebDriver driver, String username, String password) {
-        driver.get("http://localhost:3000/#/login");
+        driver.get(getFullUrl("/#/login"));
         driver.findElement(By.name("email")).sendKeys(username);
         driver.findElement(By.name("password")).sendKeys(password);
         driver.findElement(By.id("loginButton")).click();
     }
 
     protected void register(WebDriver driver, String user, String password) {
-        driver.get("http://localhost:3000/#/register");
+        driver.get(getFullUrl("/#/register"));
         clickJuiceShopPopups(driver);
         driver.findElement(By.id("emailControl")).sendKeys(user);
         driver.findElement(By.cssSelector("#mat-select-2 > div > div.mat-select-value > span")).click();
@@ -130,7 +143,7 @@ public class SeleniumTestBase {
 
         driver.findElement(By.id("registerButton")).click();
     }
-    
+
     protected void clickJuiceShopPopups(WebDriver driver) {
         clickPopupButton(driver, By.className("welcome-banner-close-button"));
         clickPopupButton(driver, By.cssSelector("body > div.cc-window > div > a"));

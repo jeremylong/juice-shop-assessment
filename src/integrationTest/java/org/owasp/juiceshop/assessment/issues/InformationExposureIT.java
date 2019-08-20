@@ -15,6 +15,8 @@
  */
 package org.owasp.juiceshop.assessment.issues;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
+import org.owasp.juiceshop.assessment.proxy.HttpStatusFilter;
 
 /**
  *
@@ -37,13 +40,14 @@ import org.owasp.juiceshop.assessment.SeleniumTestBase;
  */
 public class InformationExposureIT extends SeleniumTestBase {
 
+    private static final Logger LOG = LoggerFactory.getLogger(InformationExposureIT.class);
+
     @Test
     @Tag("security")
     @Tag("integrationTest")
-    @DisplayName("Directory listing should not be enalbed")
+    @DisplayName("Directory listing should not be enabled")
     public void directoryListingEnabled() {
-        WebDriver driver = getDriver();
-        driver.get("http://localhost:3000/#/about");
+        WebDriver driver = get("/#/about");
         WebDriverWait wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")));
         driver.findElement(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")).click();
@@ -58,13 +62,18 @@ public class InformationExposureIT extends SeleniumTestBase {
     @Tag("integrationTest")
     @DisplayName("Confidential document `acquisitions.md` exposed")
     public void confidentialDocExposed() {
+        String acquisitions = "/ftp/acquisitions.md";
+        
+        HttpStatusFilter statusMap = new HttpStatusFilter();
+        getProxy().addResponseFilter(statusMap);
 
-        WebDriver driver = getDriver();
-        driver.get("http://localhost:3000/ftp/acquisitions.md");
+        WebDriver driver = get(acquisitions);
 
         String confidentail = "This document is confidential! Do not distribute!";
-
         List<WebElement> list = driver.findElements(By.xpath("//*[contains(text(),'" + confidentail + "')]"));
+
         assertThat(list, hasSize(equalTo(0)));
+        
+        assertThat(statusMap.getStatus(getFullUrl(acquisitions)), not(equalTo(200)));
     }
 }

@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
+import org.owasp.juiceshop.assessment.selenium.ByHelper;
 
 /**
  *
@@ -47,7 +48,8 @@ public class TrackOrdersReflectedXssIT extends SeleniumTestBase {
 
         driver.findElement(By.id("userMenuButton")).click();
         Thread.sleep(1000);
-        driver.findElement(By.cssSelector("#cdk-overlay-2 > div > div > button:nth-child(4)")).click();
+        driver.findElement(ByHelper.buttonText("Track Orders")).click();
+        //driver.findElement(By.cssSelector("#cdk-overlay-2 > div > div > button:nth-child(4)")).click();
 
         Thread.sleep(1000);
         driver.findElement(By.id("orderId")).sendKeys("<iframe src=\"javascript:alert(`xss`)\">");

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
+import org.owasp.juiceshop.assessment.selenium.ByHelper;
 
 /**
  *
@@ -37,9 +38,7 @@ public class RegistrationValidationBypassIT extends SeleniumTestBase {
     @DisplayName("Repeat password validation can be bypassed")
     public void testPasswordsDoNotMatch() throws Exception {
 
-        WebDriver driver = getDriver();
-
-        driver.get("http://localhost:3000/#/register");
+        WebDriver driver = get("/#/register");
         clickJuiceShopPopups(driver);
         driver.findElement(By.id("emailControl")).sendKeys("someone@gmail.com");
         driver.findElement(By.cssSelector("#mat-select-2 > div > div.mat-select-value > span")).click();
@@ -63,5 +62,4 @@ public class RegistrationValidationBypassIT extends SeleniumTestBase {
         assertFalse(driver.findElement(By.id("registerButton")).isEnabled(),
                 "The registration button should be disabled because the passwords do not match");
     }
-
 }
