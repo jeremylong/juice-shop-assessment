@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.*;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -31,6 +30,7 @@ import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
 import org.owasp.juiceshop.assessment.proxy.HttpStatusFilter;
 
@@ -49,8 +49,8 @@ public class InformationExposureIT extends SeleniumTestBase {
     public void directoryListingEnabled() {
         WebDriver driver = get("/#/about");
         WebDriverWait wait = new WebDriverWait(driver, 30);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")));
-        driver.findElement(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")).click();
+        WebElement link = wait.until(presenceOfElementLocated(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")));
+        link.click();
         assertThat(driver.getCurrentUrl(), containsString("/ftp/"));
         String ftpUrl = driver.getCurrentUrl().substring(0, driver.getCurrentUrl().indexOf("/ftp/") + 4);
         driver.get(ftpUrl);
@@ -63,17 +63,17 @@ public class InformationExposureIT extends SeleniumTestBase {
     @DisplayName("Confidential document `acquisitions.md` exposed")
     public void confidentialDocExposed() {
         String acquisitions = "/ftp/acquisitions.md";
-        
+
         HttpStatusFilter statusMap = new HttpStatusFilter();
         getProxy().addResponseFilter(statusMap);
 
         WebDriver driver = get(acquisitions);
 
-        String confidentail = "This document is confidential! Do not distribute!";
+        String confidentail = "This document is confidential!";
         List<WebElement> list = driver.findElements(By.xpath("//*[contains(text(),'" + confidentail + "')]"));
 
-        assertThat(list, hasSize(equalTo(0)));
-        
-        assertThat(statusMap.getStatus(getFullUrl(acquisitions)), not(equalTo(200)));
+        assertThat("No confidential documents should be publicly available", list, hasSize(equalTo(0)));
+
+        assertThat("The aqcuisitions document should not be publicly available", statusMap.getStatus(getFullUrl(acquisitions)), not(equalTo(200)));
     }
 }

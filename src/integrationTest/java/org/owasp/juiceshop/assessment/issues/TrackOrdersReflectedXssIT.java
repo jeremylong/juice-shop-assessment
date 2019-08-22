@@ -15,14 +15,18 @@
  */
 package org.owasp.juiceshop.assessment.issues;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.WebElement;
+import static org.openqa.selenium.support.ui.ExpectedConditions.alertIsPresent;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
 import org.owasp.juiceshop.assessment.selenium.ByHelper;
@@ -46,18 +50,19 @@ public class TrackOrdersReflectedXssIT extends SeleniumTestBase {
         register(driver, username, password);
         login(driver, username, password);
 
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        
         driver.findElement(By.id("userMenuButton")).click();
-        Thread.sleep(1000);
-        driver.findElement(ByHelper.buttonText("Track Orders")).click();
-        //driver.findElement(By.cssSelector("#cdk-overlay-2 > div > div > button:nth-child(4)")).click();
+        WebElement element = wait.until(presenceOfElementLocated(ByHelper.buttonText("Track Orders")));
+        element.click();
 
-        Thread.sleep(1000);
-        driver.findElement(By.id("orderId")).sendKeys("<iframe src=\"javascript:alert(`xss`)\">");
+        element = wait.until(presenceOfElementLocated(By.id("orderId")));
+        element.sendKeys("<iframe src=\"javascript:alert(`xss`)\">");
+        
         driver.findElement(By.id("trackButton")).click();
-
-        WebDriverWait wait = new WebDriverWait(driver, 5 /*timeout in seconds*/);
-        if (wait.until(ExpectedConditions.alertIsPresent()) != null) {
-            fail("Alert dialog box should not be present - ensure input is validated and output is encoded");
-        }
+        
+        Alert alert = wait.until(alertIsPresent());
+        assertThat("An alert dialog box should not be present - ensure input is validated and output is encoded",
+            alert, nullValue());
     }
 }

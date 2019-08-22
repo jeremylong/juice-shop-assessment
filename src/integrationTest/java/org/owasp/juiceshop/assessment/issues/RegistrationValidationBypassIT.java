@@ -15,16 +15,15 @@
  */
 package org.owasp.juiceshop.assessment.issues;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.owasp.juiceshop.assessment.SeleniumTestBase;
-import org.owasp.juiceshop.assessment.selenium.ByHelper;
 
 /**
  *
@@ -53,13 +52,13 @@ public class RegistrationValidationBypassIT extends SeleniumTestBase {
         //cause blur
         driver.findElement(By.id("emailControl")).click();
 
-        assertTrue(driver.findElement(By.id("registerButton")).isEnabled(),
-                "The registration button should be enabled because the passwords match and all fields are completed correctly");
+        assertThat("The registration button should be enabled because the passwords match and all fields are completed correctly",
+                driver.findElement(By.id("registerButton")).isEnabled(), is(true));
 
         passwordControl.clear();
         passwordControl.sendKeys("AnyPa$$wordWillD0");
 
-        assertFalse(driver.findElement(By.id("registerButton")).isEnabled(),
-                "The registration button should be disabled because the passwords do not match");
+        assertThat("The registration button should be disabled because the passwords do not match",
+                driver.findElement(By.id("registerButton")).isEnabled(), is(false));
     }
 }

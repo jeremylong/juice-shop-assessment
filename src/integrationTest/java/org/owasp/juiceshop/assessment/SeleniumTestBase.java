@@ -44,7 +44,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class SeleniumTestBase {
 
-    private String baseUrl = "http://kubernetes.docker.internal:3000";
+    private final String baseUrl = "http://kubernetes.docker.internal:3000";
     private BrowserMobProxy proxy;
     private Proxy seleniumProxy;
     private WebDriver driver;
