@@ -17,10 +17,8 @@ package org.owasp.juiceshop.assessment.issues;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,6 @@ public class ProductsSearchIT extends RestAssuredTestBase {
                 .then()
                 .log().all()
                 .body("data.find { it.name == '1' }.description", not(containsString("admin@juice-sh.op")))
-                .body("data[0].description", not(containsString("admin@juice-sh.op")))
-                ;
+                .body("data[0].description", not(containsString("admin@juice-sh.op")));
     }
 }
