@@ -1,6 +1,22 @@
 # OWASP juice-shop assessment
 Presentation and code from OWASP AppSec DC 2019 - "Testing With Your Left Foot Forward"
 
+# Prerequisites
+
+You will need chromedriver installed:
+
+```bash
+$ brew cask upgrade chromedriver
+```
+
+You will need to update the attributes so it can be called:
+
+```bash
+$ which chromedriver
+/usr/local/bin/chromedriver
+xattr -d com.apple.quarantine  /usr/local/bin/chromedriver 
+```
+
 # Running the Tests
 
 In order for the test cases in this repo to work you must have the [OWASP Juice Shop](https://github.com/bkimminich/juice-shop)
