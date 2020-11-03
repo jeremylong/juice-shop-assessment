@@ -40,7 +40,7 @@ public class RegistrationValidationBypassIT extends SeleniumTestBase {
         WebDriver driver = get("/#/register");
         clickJuiceShopPopups(driver);
         driver.findElement(By.id("emailControl")).sendKeys("someone@gmail.com");
-        driver.findElement(By.cssSelector("#mat-select-2 > div > div.mat-select-value > span")).click();
+        driver.findElement(By.cssSelector("#mat-select-0 > div > div.mat-select-arrow-wrapper.ng-tns-c133-11")).click();
         driver.findElement(By.className("mat-option-text")).click();
         driver.findElement(By.id("securityAnswerControl")).sendKeys("bob");
         WebElement passwordControl = driver.findElement(By.id("passwordControl"));

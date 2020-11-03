@@ -29,6 +29,7 @@ import org.owasp.juiceshop.assessment.RestAssuredTestBase;
  * @author Jeremy Long
  */
 public class ProductsSearchIT extends RestAssuredTestBase {
+    
     @Test
     @Tag("security")
     @Tag("integrationTest")

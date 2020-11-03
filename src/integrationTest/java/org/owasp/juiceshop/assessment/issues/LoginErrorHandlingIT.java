@@ -50,7 +50,7 @@ public class LoginErrorHandlingIT extends RestAssuredTestBase {
                 .when()
                 .post("/rest/user/login")
                 .then()
-                //.log().all()
+                .log().all()
                 .statusCode(500)
                 .body("error.original.code", not(containsString("SQLITE_ERROR")))
                 .body("error.sql", not(containsString("SELECT ")))

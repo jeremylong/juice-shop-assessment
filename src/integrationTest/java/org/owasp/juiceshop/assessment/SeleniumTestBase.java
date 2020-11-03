@@ -17,6 +17,7 @@ package org.owasp.juiceshop.assessment;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
@@ -33,10 +34,13 @@ import org.openqa.selenium.Alert;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.owasp.juiceshop.assessment.selenium.ByHelper;
 
 /**
  *
@@ -65,6 +69,9 @@ public class SeleniumTestBase {
         seleniumProxy = getSeleniumProxy(proxy);
         ChromeOptions options = new ChromeOptions();
         options.setCapability("proxy", seleniumProxy);
+        //options.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
+        //options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        //options.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
         driver = new ChromeDriver(options);
     }
 
@@ -132,7 +139,7 @@ public class SeleniumTestBase {
         driver.get(getFullUrl("/#/register"));
         clickJuiceShopPopups(driver);
         driver.findElement(By.id("emailControl")).sendKeys(user);
-        driver.findElement(By.cssSelector("#mat-select-2 > div > div.mat-select-value > span")).click();
+        driver.findElement(By.cssSelector("#mat-select-0 > div > div.mat-select-arrow-wrapper.ng-tns-c133-11")).click();
         driver.findElement(By.className("mat-option-text")).click();
         driver.findElement(By.id("securityAnswerControl")).sendKeys("bob");
         WebElement passwordControl = driver.findElement(By.id("passwordControl"));
@@ -145,8 +152,16 @@ public class SeleniumTestBase {
     }
 
     protected void clickJuiceShopPopups(WebDriver driver) {
-        clickPopupButton(driver, By.className("welcome-banner-close-button"));
-        clickPopupButton(driver, By.cssSelector("body > div.cc-window > div > a"));
+        try {
+            if (!driver.findElements(ByHelper.buttonSpanText("Dismiss")).isEmpty()) {
+                clickPopupButton(driver, ByHelper.buttonSpanText("Dismiss"));
+            }
+            //clickPopupButton(driver, By.className("welcome-banner-close-button"));
+            if (!driver.findElements( By.cssSelector("a.cc-dismiss")).isEmpty()) {
+                clickPopupButton(driver, By.cssSelector("a.cc-dismiss"));
+            }
+            //clickPopupButton(driver, By.cssSelector("body > div.cc-window > div > a"));
+        } catch (Throwable ignore) {}
     }
 
     private void clickPopupButton(WebDriver driver, By by) {

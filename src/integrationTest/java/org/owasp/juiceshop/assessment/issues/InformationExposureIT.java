@@ -48,13 +48,15 @@ public class InformationExposureIT extends SeleniumTestBase {
     @DisplayName("Directory listing should not be enabled")
     public void directoryListingEnabled() {
         WebDriver driver = get("/#/about");
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 5);
         WebElement link = wait.until(presenceOfElementLocated(By.linkText("Check out our boring terms of use if you are interested in such lame stuff.")));
+        clickJuiceShopPopups(driver);
         link.click();
         assertThat(driver.getCurrentUrl(), containsString("/ftp/"));
         String ftpUrl = driver.getCurrentUrl().substring(0, driver.getCurrentUrl().indexOf("/ftp/") + 4);
         driver.get(ftpUrl);
-        assertThat("Directory listing should not be enabled", driver.getTitle(), not(containsString("listing directory")));
+        String title = driver.getTitle();
+        assertThat("Directory listing should not be enabled", title, not(containsString("listing directory")));
     }
 
     @Test

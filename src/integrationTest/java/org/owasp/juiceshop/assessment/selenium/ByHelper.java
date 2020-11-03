@@ -26,5 +26,9 @@ public class ByHelper {
     public static By buttonText(String text) {
         return By.xpath("//button[contains(text(), '" + text + "')]");
     }
+    
+        public static By buttonSpanText(String text) {
+        return By.xpath("//span[contains(text(), '" + text + "')]");
+    }
 
 }
